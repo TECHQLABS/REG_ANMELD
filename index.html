@@ -702,6 +702,36 @@ if (imgDataUrl) {
 
       normal('Thanking You,', LEFT, y, 10); y += 12;
 
+
+
+// ── Instructions Section ────────────────────────────────────
+if (y > 250) { doc.addPage(); y = 20; }
+
+doc.setFont('helvetica', 'bold');
+doc.setFontSize(10);
+setBlack();
+doc.text('Instructions:', LEFT, y);
+y += 6;
+
+doc.setFont('helvetica', 'normal');
+
+const instructions = [
+  '1. सभी केंद्र संचालक यह सुनिश्चित करें कि बिना MDM एप्लीकेशन के कोई भी टैबलेट (TABLETS) बायोमेट्रिक करने के लिए अनुमति न दी जाए।',
+  '2. बायोमेट्रिक पंजीकरण शुरू होने से पहले सभी ऑपरेटर को अपने-अपने मोबाइल सुरक्षा कर्मी (सिक्योरिटी) के पास जमा करना अनिवार्य होगा।',
+  '3. कंट्रोल रूम से संपर्क बनाए रखने के लिए एक मोबाइल फोन सुरक्षा कर्मियों के पास उपयोग करने के लिए ऑन रखा जाए, जिसे एक सुपरवाइजर इस्तेमाल कर सके।',
+  '4. यह केवल एक एडवाइज है, इसे इंप्लीमेंट करने से पहले आवश्यक अप्रूवल प्राप्त कर लिया जाए।'
+];
+
+instructions.forEach(line => {
+  const split = doc.splitTextToSize(line, WIDTH);
+  doc.text(split, LEFT, y);
+  y += split.length * 5 + 2;
+});
+
+y += 4;
+
+
+      
       // ── Digital seal note ──────────────────────────────────────
       doc.setFont('helvetica', 'bolditalic');
       doc.setFontSize(9);

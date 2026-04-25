@@ -263,7 +263,7 @@
 <div class="header">
   <div class="header-logo">B</div>
   <div class="header-text">
-    <h1>BPSC ADEO Examination 2026</h1>
+    <h1> JPSC JET Examination 2026</h1>
     <p>Authorization Letter Generator — Centre Supervisor & Manpower Deployment</p>
   </div>
 </div>
@@ -458,290 +458,196 @@
 }
 
   
-  // ── PDF Generation ──────────────────────────────────────────────────────────
-  function downloadPDF() {
-    if (!currentCentreData) return;
-    const d = currentCentreData;
-    const { jsPDF } = window.jspdf;
+  // ── PDF Generation ──────────────────────────────────────────────────────────function downloadPDF() {
+  if (!currentCentreData) return;
+  const d = currentCentreData;
+  const { jsPDF } = window.jspdf;
 
-    const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
 
-    const today = new Date();
-    const dd = String(today.getDate()).padStart(2,'0');
-    const mm = String(today.getMonth()+1).padStart(2,'0');
-    const yyyy = today.getFullYear();
+  const today = new Date();
+  const dd = String(today.getDate()).padStart(2,'0');
+  const mm = String(today.getMonth()+1).padStart(2,'0');
+  const yyyy = today.getFullYear();
 
-    const LEFT  = 25;
-    const RIGHT = 185;
-    const WIDTH = RIGHT - LEFT;
-    let   y     = 0;
+  const LEFT  = 25;
+  const RIGHT = 185;
+  const WIDTH = RIGHT - LEFT;
+  let y = 0;
 
-    const setBlack = () => doc.setTextColor(0, 0, 0);
+  const logoUrl = 'https://res.cloudinary.com/ds54ev38c/image/upload/v1777101410/Screenshot_2026-04-25_124212_gyoyik.png';
+  const watermarkUrl = 'https://res.cloudinary.com/ds54ev38c/image/upload/v1777103139/image_l7r4qb.png';
 
-    // Reduced base font size from 12 → 10
-    const bold   = (txt, x, cy, size = 10, align = 'left') => {
-      setBlack();
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(size);
-      doc.text(txt, x, cy, { align });
-    };
-    const normal = (txt, x, cy, size = 10, align = 'left') => {
-      setBlack();
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(size);
-      doc.text(txt, x, cy, { align });
-    };
+  const setBlack = () => doc.setTextColor(0, 0, 0);
 
-    // ── Company Logo (top-left) + Title (centered) ────────────────
-    const logoUrl = 'https://res.cloudinary.com/ds54ev38c/image/upload/v1777101410/Screenshot_2026-04-25_124212_gyoyik.png';
+  const bold = (txt, x, cy, size = 10, align = 'left') => {
+    setBlack();
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(size);
+    doc.text(txt, x, cy, { align });
+  };
 
-    const addContent = (imgDataUrl) => {
-      // Draw logo: top-left corner, 40mm wide, auto-height ~15mm
-    // Full width logo
-console.log("ADD CONTENT CALLED");
-console.log("Image exists:", !!imgDataUrl);
-if (imgDataUrl) {
-  try {
+  const normal = (txt, x, cy, size = 10, align = 'left') => {
+    setBlack();
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(size);
+    doc.text(txt, x, cy, { align });
+  };
+
+  // 🔹 Convert image URL → base64
+  const loadImageAsBase64 = (url) => {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.crossOrigin = 'Anonymous';
+      img.onload = function () {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+        resolve(canvas.toDataURL('image/png'));
+      };
+      img.src = url;
+    });
+  };
+
+  // 🔥 WATERMARK FUNCTION
+  const addWatermark = (watermarkDataUrl) => {
+    if (!watermarkDataUrl) return;
+
     const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
 
-    // Maintain aspect ratio
-    const imgProps = doc.getImageProperties(imgDataUrl);
-    const imgHeight = (imgProps.height * pageWidth) / imgProps.width;
+    const imgProps = doc.getImageProperties(watermarkDataUrl);
 
-    doc.addImage(imgDataUrl, 'PNG', 0, y, pageWidth, imgHeight);
+    const imgWidth = pageWidth * 0.5;
+    const imgHeight = (imgProps.height * imgWidth) / imgProps.width;
 
-    y += imgHeight + 5; // move cursor below image
-  } catch(e) {
-    console.log("Logo error:", e);
-  }
-}
+    const x = (pageWidth - imgWidth) / 2;
+    const yCenter = (pageHeight - imgHeight) / 2;
 
-      // Title centered vertically with logo (~y + 8 to center text in 15mm block)
-      bold('AUTHORIZATION LETTER', 105, y + 8, 14, 'center');
-      y += 20;
+    doc.addImage(watermarkDataUrl, 'PNG', x, yCenter, imgWidth, imgHeight);
+  };
 
-      // ── Date: right-aligned ─────────────────────────────────────
-      normal(`Date: ${dd} / ${mm} / ${yyyy}`, RIGHT, y, 10, 'right');
-      y += 7;
+  const addContent = (logoBase64, watermarkBase64) => {
 
-      // ── To block ──────────────────────────────────────────────
-      normal('To,', LEFT, y, 10);            y += 5;
-      bold('The Centre Superintendent/Principal', LEFT, y, 10); y += 5;
-      normal('Concern Examination', LEFT, y, 10); y += 6;
+    // ✅ Add watermark FIRST (background)
+    addWatermark(watermarkBase64);
 
-      // ── Subject (bold) ──────────────────────────────────────────
-      bold('Subject: Authorization for Exam Centre Supervisor and Manpower Deployment', LEFT, y, 10);
-      y += 7;
+    // ── LOGO FULL WIDTH ─────────────────────
+    if (logoBase64) {
+      try {
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const imgProps = doc.getImageProperties(logoBase64);
+        const imgHeight = (imgProps.height * pageWidth) / imgProps.width;
 
-      // ── Dear Sir/Madam ──────────────────────────────────────────
-      normal('Dear Sir/Madam,', LEFT, y, 10); y += 6;
-
-      // ── Body paragraph ──────────────────────────────────────────
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(10);
-      setBlack();
-      const bodyText =
-        'We hereby authorize the following personnel for deployment at the  JPSC JET Examination ' +
-        'Centre Exam Date 26.04.2026. The details of the Centre Supervisor and manpower, along with ' +
-        'their Aadhaar information, are provided below.';
-      const bodyLines = doc.splitTextToSize(bodyText, WIDTH);
-      doc.text(bodyLines, LEFT, y);
-      y += bodyLines.length * 5 + 4;
-
-      // ── Section 1: Centre Details ───────────────────────────────
-      bold('1. Centre Details:', LEFT, y, 10); y += 6;
-
-      const bullet   = LEFT + 4;
-      const labelEnd = LEFT + 42;
-      const lineGap  = 6;
-
-      const centreFields = [
-        { label: 'Centre Name:',       value: d.centreName || '________________________' },
-        { label: 'Centre Code:',       value: d.centreCode || '________________________' },
-        { label: 'Location/Address:',  value: `${d.centreName || ''}, ${d.city || ''}, ${d.state || ''}` },
-      ];
-
-      centreFields.forEach(f => {
-        doc.setFont('helvetica','normal'); doc.setFontSize(10); setBlack();
-        doc.text('\u2022', bullet, y);
-        bold(f.label, bullet + 4, y, 10);
-        const valLines = doc.splitTextToSize(f.value, WIDTH - 48);
-        normal(valLines[0], labelEnd, y, 10);
-        if (valLines.length > 1) {
-          valLines.slice(1).forEach((l, idx) => normal(l, labelEnd, y + (idx+1)*5, 10));
-          y += (valLines.length - 1) * 5;
-        }
-        y += lineGap;
-      });
-
-      y += 2;
-
-      // ── Section 2: Supervisor Table ─────────────────────────────
-      bold('2. Centre Supervisor Details:', LEFT, y, 10); y += 4;
-
-      const supRows = (d.supervisors && d.supervisors.length)
-        ? d.supervisors.map((s, i) => [String(i + 1), s.name || '', maskMobile(s.mobile) || '', s.aadhaar || ''])
-        : [['1','','',''],['2','','','']];
-
-      const tableBorderColor = [0, 0, 0];
-      const tableLineWidth   = 0.3;
-
-      doc.autoTable({
-        startY: y,
-        head: [['S. No.', 'Name of Supervisor', 'Mobile Number', 'Aadhaar Number']],
-        body: supRows,
-        margin: { left: LEFT, right: 25 },
-        styles: {
-          fontSize: 9,
-          cellPadding: 2.5,
-          textColor: [0, 0, 0],
-          lineColor: tableBorderColor,
-          lineWidth: tableLineWidth,
-          font: 'helvetica',
-          fontStyle: 'normal',
-          fillColor: false,
-          halign: 'left',
-          overflow: 'linebreak',
-        },
-        headStyles: {
-          fillColor: false,
-          textColor: [0, 0, 0],
-          fontStyle: 'bold',
-          lineColor: tableBorderColor,
-          lineWidth: tableLineWidth,
-        },
-        bodyStyles: { fillColor: false },
-        alternateRowStyles: { fillColor: false },
-        columnStyles: {
-          0: { halign: 'center', cellWidth: 14 },
-          1: { cellWidth: 76 },
-          2: { halign: 'center', cellWidth: 38 },
-          3: { halign: 'center', cellWidth: 38, overflow: 'visible' },
-        },
-        tableLineColor: tableBorderColor,
-        tableLineWidth: tableLineWidth,
-      });
-      y = doc.lastAutoTable.finalY + 6;
-
-      // ── Section 3: Manpower Table ───────────────────────────────
-      bold('3. Manpower Details:', LEFT, y, 10); y += 4;
-
-      const opRows = (d.operators && d.operators.length)
-        ? d.operators.map((o, i) => [
-            String(i + 1),
-            o.name || '',
-            o.designation || '',
-               maskMobile(o.mobile),
-            // Format Aadhaar as single line (remove spaces/newlines)
-            (o.aadhaar || '').toString().replace(/\s+/g, ' ').trim()
-          ])
-        : [['1','','','',''],['2','','','',''],['3','','','',''],['4','','','','']];
-
-      doc.autoTable({
-        startY: y,
-        head: [['S. No.', 'Name of Staff', 'Role/Designation', 'Mobile Number', 'Aadhaar Number']],
-        body: opRows,
-        margin: { left: LEFT, right: 25 },
-        styles: {
-          fontSize: 9,
-          cellPadding: 2.5,
-          textColor: [0, 0, 0],
-          lineColor: tableBorderColor,
-          lineWidth: tableLineWidth,
-          font: 'helvetica',
-          fontStyle: 'normal',
-          fillColor: false,
-        },
-        headStyles: {
-          fillColor: false,
-          textColor: [0, 0, 0],
-          fontStyle: 'bold',
-          lineColor: tableBorderColor,
-          lineWidth: tableLineWidth,
-        },
-        bodyStyles: { fillColor: false },
-        alternateRowStyles: { fillColor: false },
-        columnStyles: {
-          0: { halign: 'center', cellWidth: 14 },
-          1: { cellWidth: 46 },
-          2: { cellWidth: 36 },
-          3: { halign: 'center', cellWidth: 34 },
-          // Wider Aadhaar column + overflow visible so it never wraps to 2 lines
-          4: { halign: 'center', cellWidth: 36, overflow: 'visible' },
-        },
-        tableLineColor: tableBorderColor,
-        tableLineWidth: tableLineWidth,
-      });
-
-      y = doc.lastAutoTable.finalY + 6;
-
-      if (y > 260) { doc.addPage(); y = 20; }
-
-      // ── Closing paragraph ──────────────────────────────────────
-      doc.setFont('helvetica','normal'); doc.setFontSize(10); setBlack();
-      const closeText =
-        'All the above-mentioned personnel are authorized to perform their respective duties at the ' +
-        'examination centre. Their identity will be verified through Aadhaar at the time of reporting.';
-      const closeLines = doc.splitTextToSize(closeText, WIDTH);
-      doc.text(closeLines, LEFT, y);
-      y += closeLines.length * 5 + 6;
-
-// ── Instructions Section ────────────────────────────────────
-if (y > 250) { doc.addPage(); y = 20; }
-
-doc.setFont('helvetica', 'bold');
-doc.setFontSize(10);
-setBlack();
-doc.text('Instructions:', LEFT, y);
-y += 6;
-
-doc.setFont('helvetica', 'normal');
-
-
-
-      
-const instructions = [
-  '1. Please verify Candidate Attendance with Principal',
-
-];
-
-instructions.forEach(line => {
-  const split = doc.splitTextToSize(line, WIDTH);
-  doc.text(split, LEFT, y);
-  y += split.length * 5 + 2;
-});
-
-y += 4;
-
-
-      
-      
-
-      normal('Thanking You,', LEFT, y, 10); y += 12;
-
-      
-      // ── Digital seal note ──────────────────────────────────────
-      doc.setFont('helvetica', 'bolditalic');
-      doc.setFontSize(9);
-      setBlack();
-      const sealText =
-        'This document is digitally & electronically generated and is valid without signature or seal.';
-      const sealLines = doc.splitTextToSize(sealText, WIDTH);
-      doc.text(sealLines, 105, y, { align: 'center' });
-
-      // ── Page numbers ────────────────────────────────────────────
-      const pageCount = doc.internal.getNumberOfPages();
-      for (let i = 1; i <= pageCount; i++) {
-        doc.setPage(i);
-        doc.setFont('helvetica','normal');
-        doc.setFontSize(7);
-        doc.setTextColor(150,150,150);
-        doc.text(`Page ${i} of ${pageCount}`, 105, 290, { align:'center' });
+        doc.addImage(logoBase64, 'PNG', 0, y, pageWidth, imgHeight);
+        y += imgHeight + 5;
+      } catch(e) {
+        console.log("Logo error:", e);
       }
+    }
 
-      doc.save(`Authorization_${d.centreCode}_BPSC_ADEO_2026.pdf`);
-    };
+    // ── TITLE ──────────────────────────────
+    bold('AUTHORIZATION LETTER', 105, y + 8, 14, 'center');
+    y += 20;
 
+    // Date
+    normal(`Date: ${dd} / ${mm} / ${yyyy}`, RIGHT, y, 10, 'right');
+    y += 7;
+
+    // To
+    normal('To,', LEFT, y); y += 5;
+    bold('The Centre Superintendent/Principal', LEFT, y); y += 5;
+    normal('Concern Examination', LEFT, y); y += 6;
+
+    // Subject
+    bold('Subject: Authorization for Exam Centre Supervisor and Manpower Deployment', LEFT, y);
+    y += 7;
+
+    // Greeting
+    normal('Dear Sir/Madam,', LEFT, y); y += 6;
+
+    // Body
+    const bodyText =
+      'We hereby authorize the following personnel for deployment at the JPSC JET Examination ' +
+      'Centre Exam Date 26.04.2026. The details of the Centre Supervisor and manpower, along with ' +
+      'their Aadhaar information, are provided below.';
+
+    const bodyLines = doc.splitTextToSize(bodyText, WIDTH);
+    doc.text(bodyLines, LEFT, y);
+    y += bodyLines.length * 5 + 4;
+
+    // Section 1
+    bold('1. Centre Details:', LEFT, y); y += 6;
+
+    const centreFields = [
+      { label: 'Centre Name:', value: d.centreName || '________' },
+      { label: 'Centre Code:', value: d.centreCode || '________' },
+      { label: 'Location/Address:', value: `${d.centreName || ''}, ${d.city || ''}, ${d.state || ''}` },
+    ];
+
+    centreFields.forEach(f => {
+      bold(f.label, LEFT, y);
+      normal(f.value, LEFT + 50, y);
+      y += 6;
+    });
+
+    // Supervisor Table
+    bold('2. Centre Supervisor Details:', LEFT, y); y += 4;
+
+    doc.autoTable({
+      startY: y,
+      head: [['S. No.', 'Name', 'Mobile', 'Aadhaar']],
+      body: (d.supervisors || []).map((s,i)=>[
+        i+1, s.name, s.mobile, s.aadhaar
+      ])
+    });
+
+    y = doc.lastAutoTable.finalY + 6;
+
+    // Manpower Table
+    bold('3. Manpower Details:', LEFT, y); y += 4;
+
+    doc.autoTable({
+      startY: y,
+      head: [['S. No.', 'Name', 'Role', 'Mobile', 'Aadhaar']],
+      body: (d.operators || []).map((o,i)=>[
+        i+1, o.name, o.designation, o.mobile, o.aadhaar
+      ])
+    });
+
+    y = doc.lastAutoTable.finalY + 6;
+
+    // Closing
+    const closeText =
+      'All the above-mentioned personnel are authorized to perform their respective duties at the examination centre.';
+    const closeLines = doc.splitTextToSize(closeText, WIDTH);
+    doc.text(closeLines, LEFT, y);
+    y += closeLines.length * 5 + 10;
+
+    normal('Thanking You,', LEFT, y);
+
+    // Page numbers
+    const pageCount = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(7);
+      doc.setTextColor(150);
+      doc.text(`Page ${i} of ${pageCount}`, 105, 290, { align:'center' });
+    }
+
+    doc.save(`Authorization_${d.centreCode}.pdf`);
+  };
+
+  // 🔥 Load both images
+  Promise.all([
+    loadImageAsBase64(logoUrl),
+    loadImageAsBase64(watermarkUrl)
+  ]).then(([logoBase64, watermarkBase64]) => {
+    addContent(logoBase64, watermarkBase64);
+  });
+}
     // ── Load logo image via fetch → base64, then build PDF ───────
     // ── Load logo image via fetch → base64, then build PDF ───────
 const getBase64FromUrl = async (url) => {

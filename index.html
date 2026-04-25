@@ -650,28 +650,29 @@
 }
     // ── Load logo image via fetch → base64, then build PDF ───────
     // ── Load logo image via fetch → base64, then build PDF ───────
-const getBase64FromUrl = async (url) => {
-  const res = await fetch(url);
-  if (!res.ok) throw new Error("Image fetch failed");
 
-  const blob = await res.blob();
+//const getBase64FromUrl = async (url) => {
+//  const res = await fetch(url);
+ // if (!res.ok) throw new Error("Image fetch failed");
 
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onloadend = () => resolve(reader.result);
-    reader.onerror = reject;
-    reader.readAsDataURL(blob);
-  });
-};
+//  const blob = await res.blob();
 
-getBase64FromUrl(logoUrl)
-  .then(dataUrl => addContent(dataUrl))
-  .catch(err => {
-    console.log("Image load failed:", err);
-    addContent(null);
-  });
-  }
+  //return new Promise((resolve, reject) => {
+ //   const reader = new FileReader();
+  //  reader.onloadend = () => resolve(reader.result);
+ //   reader.onerror = reject;
+ //   reader.readAsDataURL(blob);
+//  });
+//};
 
+//getBase64FromUrl(logoUrl)
+ // .then(dataUrl => addContent(dataUrl))
+ // .catch(err => {
+  //  console.log("Image load failed:", err);
+ //   addContent(null);
+ // });
+//  }
+//-->
   // ── Helpers ──────────────────────────────────────────────────────────────────
   function showLoading(show) {
     document.getElementById('loading').style.display = show ? 'block' : 'none';

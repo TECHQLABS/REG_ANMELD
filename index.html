@@ -303,22 +303,6 @@
     <div class="centre-banner" id="centreBanner"></div>
 
 
-
-
-
-  <!-- ✅ ADD HERE -->
-  <div style="margin-bottom:20px; padding:16px; background:#fff8e1; border-left:4px solid #ffb300; border-radius:8px; font-size:0.9rem; line-height:1.6;">
-    <strong>📋 निर्देश:</strong>
-    <ol style="margin-top:10px; padding-left:18px;">
-      <li>सभी केंद्र संचालक यह सुनिश्चित करें कि बिना MDM एप्लीकेशन के कोई भी टैबलेट (TABLETS) बायोमेट्रिक करने के लिए अनुमति न दी जाए।</li>
-      <li>बायोमेट्रिक पंजीकरण शुरू होने से पहले सभी ऑपरेटर को अपने-अपने मोबाइल सुरक्षा कर्मी (सिक्योरिटी) के पास जमा करना अनिवार्य होगा।</li>
-      <li>कंट्रोल रूम से संपर्क बनाए रखने के लिए एक मोबाइल फोन सुरक्षा कर्मियों के पास उपयोग करने के लिए ऑन रखा जाए, जिसे एक सुपरवाइजर इस्तेमाल कर सके।</li>
-  
-    </ol>
-  </div>
-
-    
-
     <!-- Supervisor Table -->
     <div class="section-title">👨‍💼 Centre Supervisor Details</div>
     <table class="data-table" id="supervisorTable">
@@ -509,7 +493,7 @@
     };
 
     // ── Company Logo (top-left) + Title (centered) ────────────────
-    const logoUrl = 'https://res.cloudinary.com/di0nak6xp/image/upload/v1776259570/sai_snoaom.png';
+    const logoUrl = 'https://res.cloudinary.com/ds54ev38c/image/upload/v1777101410/Screenshot_2026-04-25_124212_gyoyik.png';
 
     const addContent = (imgDataUrl) => {
       // Draw logo: top-left corner, 40mm wide, auto-height ~15mm
@@ -557,8 +541,8 @@ if (imgDataUrl) {
       doc.setFontSize(10);
       setBlack();
       const bodyText =
-        'We hereby authorize the following personnel for deployment at the BPSC ADEO Examination ' +
-        'Centre Exam Date 21.04.2026. The details of the Centre Supervisor and manpower, along with ' +
+        'We hereby authorize the following personnel for deployment at the  JPSC JET Examination ' +
+        'Centre Exam Date 26.04.2026. The details of the Centre Supervisor and manpower, along with ' +
         'their Aadhaar information, are provided below.';
       const bodyLines = doc.splitTextToSize(bodyText, WIDTH);
       doc.text(bodyLines, LEFT, y);
@@ -717,9 +701,7 @@ doc.setFont('helvetica', 'normal');
 
       
 const instructions = [
-  '1. Ensure no tablet without MDM is used for biometric.',
-  '2. All operators must deposit mobile phones before biometric.',
-  '3. One mobile should remain with security for supervisor use.',
+  '1. Please verify Candidate Attendance with Principal',
 
 ];
 

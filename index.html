@@ -4,14 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>JPSC JET Exam – Authorization Letter</title>
-
-  <!-- jsPDF + AutoTable for PDF generation -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
-
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-
     body {
       font-family: 'Segoe UI', Arial, sans-serif;
       background: #f0f2f5;
@@ -19,31 +15,32 @@
       color: #1a1a2e;
     }
 
-    /* ─── Header ──────────────────────────────────────────────── */
+    /* ─── Header — Blue/White company colours ─────────── */
     .header {
-      background: linear-gradient(135deg, #1a237e 0%, #283593 60%, #3949ab 100%);
+      background: linear-gradient(135deg, #0d47a1 0%, #1565c0 60%, #1976d2 100%);
       color: white;
       padding: 20px 40px;
       display: flex;
       align-items: center;
       gap: 16px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      border-bottom: 3px solid #ffffff33;
     }
     .header-logo {
       width: 52px; height: 52px;
-      background: rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.95);
       border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
-      font-size: 24px; font-weight: 900;
-      border: 2px solid rgba(255,255,255,0.4);
+      font-size: 22px; font-weight: 900;
+      color: #0d47a1;
+      border: 2px solid rgba(255,255,255,0.6);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
     }
-    .header-text h1 { font-size: 1.4rem; font-weight: 700; letter-spacing: 0.5px; }
-    .header-text p  { font-size: 0.8rem; opacity: 0.8; margin-top: 2px; }
+    .header-text h1 { font-size: 1.4rem; font-weight: 700; letter-spacing: 0.5px; color: #ffffff; }
+    .header-text p  { font-size: 0.8rem; opacity: 0.85; margin-top: 2px; color: #e3f2fd; }
 
-    /* ─── Main Container ──────────────────────────────────────── */
     .container { max-width: 1100px; margin: 32px auto; padding: 0 20px; }
 
-    /* ─── Search Card ─────────────────────────────────────────── */
     .search-card {
       background: white;
       border-radius: 16px;
@@ -53,34 +50,16 @@
     }
     .search-card h2 {
       font-size: 1rem;
-      color: #5c6bc0;
+      color: #1565c0;
       margin-bottom: 16px;
       text-transform: uppercase;
       letter-spacing: 1px;
       font-weight: 600;
     }
-    .search-row {
-      display: flex;
-      gap: 12px;
-      align-items: flex-end;
-      flex-wrap: wrap;
-    }
-    .field-group {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      flex: 1;
-      min-width: 200px;
-    }
-    .field-group label {
-      font-size: 0.75rem;
-      font-weight: 600;
-      color: #757575;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    .field-group select,
-    .field-group input {
+    .search-row { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; }
+    .field-group { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 200px; }
+    .field-group label { font-size: 0.75rem; font-weight: 600; color: #757575; text-transform: uppercase; letter-spacing: 0.5px; }
+    .field-group select, .field-group input {
       padding: 10px 14px;
       border: 1.5px solid #e0e0e0;
       border-radius: 8px;
@@ -90,14 +69,10 @@
       transition: border-color 0.2s;
       outline: none;
     }
-    .field-group select:focus,
-    .field-group input:focus {
-      border-color: #3949ab;
-      background: white;
-    }
+    .field-group select:focus, .field-group input:focus { border-color: #1565c0; background: white; }
     .btn-fetch {
       padding: 10px 28px;
-      background: #3949ab;
+      background: #1565c0;
       color: white;
       border: none;
       border-radius: 8px;
@@ -107,29 +82,21 @@
       transition: background 0.2s, transform 0.1s;
       white-space: nowrap;
     }
-    .btn-fetch:hover  { background: #283593; }
+    .btn-fetch:hover  { background: #0d47a1; }
     .btn-fetch:active { transform: scale(0.98); }
-    .btn-fetch:disabled { background: #9fa8da; cursor: not-allowed; }
+    .btn-fetch:disabled { background: #90caf9; cursor: not-allowed; }
 
-    /* ─── Loading ─────────────────────────────────────────────── */
-    .loading {
-      display: none;
-      text-align: center;
-      padding: 32px;
-      color: #5c6bc0;
-      font-size: 0.9rem;
-    }
+    .loading { display: none; text-align: center; padding: 32px; color: #1565c0; font-size: 0.9rem; }
     .spinner {
       width: 36px; height: 36px;
-      border: 4px solid #e8eaf6;
-      border-top: 4px solid #3949ab;
+      border: 4px solid #e3f2fd;
+      border-top: 4px solid #1565c0;
       border-radius: 50%;
       animation: spin 0.8s linear infinite;
       margin: 0 auto 12px;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ─── Result Card ─────────────────────────────────────────── */
     .result-card {
       background: white;
       border-radius: 16px;
@@ -137,125 +104,54 @@
       box-shadow: 0 4px 20px rgba(0,0,0,0.08);
       display: none;
     }
-
-    /* ─── Centre Info Banner ──────────────────────────────────── */
     .centre-banner {
-      background: linear-gradient(135deg, #e8eaf6, #c5cae9);
+      background: linear-gradient(135deg, #e3f2fd, #bbdefb);
       border-radius: 12px;
       padding: 20px 24px;
       margin-bottom: 24px;
-      border-left: 5px solid #3949ab;
+      border-left: 5px solid #1565c0;
     }
-    .centre-banner h3 {
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: #1a237e;
-      margin-bottom: 8px;
-    }
-    .centre-meta {
-      display: flex;
-      gap: 24px;
-      flex-wrap: wrap;
-    }
-    .meta-chip {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 0.85rem;
-      color: #3949ab;
-      font-weight: 500;
-    }
+    .centre-banner h3 { font-size: 1.1rem; font-weight: 700; color: #0d47a1; margin-bottom: 8px; }
+    .centre-meta { display: flex; gap: 24px; flex-wrap: wrap; }
+    .meta-chip { display: flex; align-items: center; gap: 6px; font-size: 0.85rem; color: #1565c0; font-weight: 500; }
     .meta-chip span.icon { font-size: 1rem; }
 
-    /* ─── Section headers ─────────────────────────────────────── */
     .section-title {
-      font-size: 0.85rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      color: #5c6bc0;
-      margin: 20px 0 12px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+      color: #1565c0; margin: 20px 0 12px;
+      display: flex; align-items: center; gap: 8px;
     }
-    .section-title::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: #e8eaf6;
-    }
+    .section-title::after { content: ''; flex: 1; height: 1px; background: #e3f2fd; }
 
-    /* ─── Tables ──────────────────────────────────────────────── */
-    .data-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.88rem;
-      margin-bottom: 8px;
-    }
+    .data-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; margin-bottom: 8px; }
     .data-table th {
-      background: #3949ab;
-      color: white;
-      padding: 10px 14px;
-      text-align: left;
-      font-weight: 600;
-      font-size: 0.8rem;
-      letter-spacing: 0.3px;
+      background: #1565c0;
+      color: white; padding: 10px 14px; text-align: left;
+      font-weight: 600; font-size: 0.8rem; letter-spacing: 0.3px;
     }
     .data-table th:first-child { border-radius: 6px 0 0 0; }
     .data-table th:last-child  { border-radius: 0 6px 0 0; }
-    .data-table td {
-      padding: 9px 14px;
-      border-bottom: 1px solid #f0f0f0;
-      color: #333;
-    }
-    .data-table tr:hover td { background: #f5f6ff; }
+    .data-table td { padding: 9px 14px; border-bottom: 1px solid #f0f0f0; color: #333; }
+    .data-table tr:hover td { background: #f0f7ff; }
     .data-table tr:last-child td { border-bottom: none; }
-    .data-table .sno { width: 44px; text-align: center; color: #9fa8da; font-weight: 600; }
+    .data-table .sno { width: 44px; text-align: center; color: #90caf9; font-weight: 600; }
 
-    /* ─── Download button ─────────────────────────────────────── */
     .btn-download {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-top: 28px;
-      padding: 14px 32px;
+      display: flex; align-items: center; gap: 10px;
+      margin-top: 28px; padding: 14px 32px;
       background: linear-gradient(135deg, #1b5e20, #2e7d32);
-      color: white;
-      border: none;
-      border-radius: 10px;
-      font-size: 1rem;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.2s;
-      box-shadow: 0 4px 14px rgba(46,125,50,0.35);
+      color: white; border: none; border-radius: 10px;
+      font-size: 1rem; font-weight: 700; cursor: pointer;
+      transition: all 0.2s; box-shadow: 0 4px 14px rgba(46,125,50,0.35);
     }
     .btn-download:hover  { background: linear-gradient(135deg, #145a32, #1b5e20); transform: translateY(-1px); }
     .btn-download:active { transform: translateY(0); }
     .btn-download svg { width: 20px; height: 20px; fill: white; }
 
-    /* ─── Empty / Error states ────────────────────────────────── */
-    .empty-state {
-      text-align: center;
-      padding: 48px 24px;
-      color: #bdbdbd;
-    }
-    .empty-state .icon { font-size: 3rem; margin-bottom: 12px; }
-    .empty-state p { font-size: 0.95rem; }
-
     .error-msg {
-      background: #fce4ec;
-      color: #c62828;
-      padding: 14px 18px;
-      border-radius: 8px;
-      font-size: 0.9rem;
-      display: none;
-      margin-top: 12px;
+      background: #fce4ec; color: #c62828; padding: 14px 18px;
+      border-radius: 8px; font-size: 0.9rem; display: none; margin-top: 12px;
     }
-
-    /* ─── Date picker row ─────────────────────────────────────── */
-    .date-row { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; }
-    .date-row .field-group { min-width: 160px; flex: 0; }
   </style>
 </head>
 <body>
@@ -263,14 +159,13 @@
 <div class="header">
   <div class="header-logo">B</div>
   <div class="header-text">
-    <h1> JPSC JET Examination 2026</h1>
-    <p>Authorization Letter Generator — Centre Supervisor & Manpower Deployment</p>
+    <h1>JPSC JET Examination 2026</h1>
+    <p>Authorization Letter Generator — Centre Supervisor &amp; Manpower Deployment</p>
   </div>
 </div>
 
 <div class="container">
 
-  <!-- Search Card -->
   <div class="search-card">
     <h2>🔍 Select Examination Centre</h2>
     <div class="search-row">
@@ -290,20 +185,14 @@
     <div class="error-msg" id="errorMsg"></div>
   </div>
 
-  <!-- Loading -->
   <div class="loading" id="loading">
     <div class="spinner"></div>
     Fetching centre data…
   </div>
 
-  <!-- Result Card -->
   <div class="result-card" id="resultCard">
-
-    <!-- Centre Banner -->
     <div class="centre-banner" id="centreBanner"></div>
 
-
-    <!-- Supervisor Table -->
     <div class="section-title">👨‍💼 Centre Supervisor Details</div>
     <table class="data-table" id="supervisorTable">
       <thead>
@@ -317,7 +206,6 @@
       <tbody id="supervisorBody"></tbody>
     </table>
 
-    <!-- Operator Table -->
     <div class="section-title">👷 Manpower / Operator Details</div>
     <table class="data-table" id="operatorTable">
       <thead>
@@ -332,24 +220,18 @@
       <tbody id="operatorBody"></tbody>
     </table>
 
-    <!-- Download -->
     <button class="btn-download" onclick="downloadPDF()">
       <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
       Download Authorization Letter (PDF)
     </button>
-
   </div>
 
 </div>
 
 <script>
-  // ── CONFIG ──────────────────────────────────────────────────────────────────
-  // Change this to your Ktor server base URL
   const API_BASE = 'https://croireatpl.in/api';
-
   let currentCentreData = null;
 
-  // ── On page load: populate dropdown ────────────────────────────────────────
   window.addEventListener('DOMContentLoaded', async () => {
     try {
       const res = await fetch(`${API_BASE}/api/centres`);
@@ -365,8 +247,7 @@
         });
       }
     } catch(e) {
-      document.getElementById('centreDropdown').innerHTML =
-        '<option value="">⚠ Could not load centres</option>';
+      document.getElementById('centreDropdown').innerHTML = '<option value="">⚠ Could not load centres</option>';
     }
   });
 
@@ -375,28 +256,19 @@
     if (val) document.getElementById('centreCodeInput').value = val;
   }
 
-  // ── Fetch centre ────────────────────────────────────────────────────────────
   async function fetchCentre() {
     const code = document.getElementById('centreCodeInput').value.trim().toUpperCase();
     if (!code) { showError('Please enter or select a centre code.'); return; }
-
     hideError();
     showLoading(true);
     document.getElementById('resultCard').style.display = 'none';
-
     try {
       const res  = await fetch(`${API_BASE}/api/centre/${code}`);
       const json = await res.json();
-
-      if (!json.success || !json.data) {
-        showError(json.message || `Centre '${code}' not found.`);
-        return;
-      }
-
+      if (!json.success || !json.data) { showError(json.message || `Centre '${code}' not found.`); return; }
       currentCentreData = json.data;
       renderCentreData(json.data);
       document.getElementById('resultCard').style.display = 'block';
-
     } catch(e) {
       showError('Network error — is the server running?');
     } finally {
@@ -404,9 +276,12 @@
     }
   }
 
-  // ── Render ──────────────────────────────────────────────────────────────────
+  function maskMobile(mobile) {
+    if (!mobile || mobile.length < 5) return mobile;
+    return mobile.substring(0, 2) + '××××××××' + mobile.substring(mobile.length - 2);
+  }
+
   function renderCentreData(data) {
-    // Banner
     document.getElementById('centreBanner').innerHTML = `
       <h3>${data.centreName}</h3>
       <div class="centre-meta">
@@ -415,277 +290,205 @@
         ${data.zone ? `<span class="meta-chip"><span class="icon">📍</span> ${data.zone}</span>` : ''}
       </div>
     `;
-
-    // Supervisors
     const sb = document.getElementById('supervisorBody');
     sb.innerHTML = '';
     if (data.supervisors && data.supervisors.length) {
       data.supervisors.forEach((s, i) => {
-        sb.innerHTML += `<tr>
-          <td class="sno">${i+1}</td>
-          <td>${s.name}</td>
-          <td>${maskMobile(s.mobile)}</td>
-          <td>${s.aadhaar}</td>
-        </tr>`;
+        sb.innerHTML += `<tr><td class="sno">${i+1}</td><td>${s.name}</td><td>${maskMobile(s.mobile)}</td><td>${s.aadhaar}</td></tr>`;
       });
     } else {
       sb.innerHTML = `<tr><td colspan="4" style="text-align:center;color:#9e9e9e;padding:16px">No supervisor data</td></tr>`;
     }
-
-    // Operators
     const ob = document.getElementById('operatorBody');
     ob.innerHTML = '';
     if (data.operators && data.operators.length) {
       data.operators.forEach((o, i) => {
-        ob.innerHTML += `<tr>
-          <td class="sno">${i+1}</td>
-          <td>${o.name}</td>
-          <td>${o.designation}</td>
-    <td>${maskMobile(o.mobile)}</td>
-          <td>${o.aadhaar}</td>
-        </tr>`;
+        ob.innerHTML += `<tr><td class="sno">${i+1}</td><td>${o.name}</td><td>${o.designation}</td><td>${maskMobile(o.mobile)}</td><td>${o.aadhaar}</td></tr>`;
       });
     } else {
       ob.innerHTML = `<tr><td colspan="5" style="text-align:center;color:#9e9e9e;padding:16px">No operator data</td></tr>`;
     }
   }
 
-
-
-  function maskMobile(mobile) {
-  if (!mobile || mobile.length < 5) return mobile;
-  return mobile.substring(0, 2) + '********' + mobile.substring(mobile.length - 3);
-}
-
-  
   // ── PDF Generation ──────────────────────────────────────────────────────────
   function downloadPDF() {
-  if (!currentCentreData) return;
-  const d = currentCentreData;
-  const { jsPDF } = window.jspdf;
+    if (!currentCentreData) return;
+    const d = currentCentreData;
+    const { jsPDF } = window.jspdf;
 
-  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+    const today = new Date();
+    const dd   = String(today.getDate()).padStart(2,'0');
+    const mm   = String(today.getMonth()+1).padStart(2,'0');
+    const yyyy = today.getFullYear();
 
-  const today = new Date();
-  const dd = String(today.getDate()).padStart(2,'0');
-  const mm = String(today.getMonth()+1).padStart(2,'0');
-  const yyyy = today.getFullYear();
+    const LEFT  = 25;
+    const RIGHT = 185;
+    const WIDTH = RIGHT - LEFT;
 
-  const LEFT  = 25;
-  const RIGHT = 185;
-  const WIDTH = RIGHT - LEFT;
-  let y = 0;
+    const logoUrl      = 'https://res.cloudinary.com/ds54ev38c/image/upload/v1777101410/Screenshot_2026-04-25_124212_gyoyik.png';
+    const watermarkUrl = 'https://res.cloudinary.com/ds54ev38c/image/upload/v1777103139/image_l7r4qb.png';
 
-  const logoUrl = 'https://res.cloudinary.com/ds54ev38c/image/upload/v1777101410/Screenshot_2026-04-25_124212_gyoyik.png';
-  const watermarkUrl = 'https://res.cloudinary.com/ds54ev38c/image/upload/v1777103139/image_l7r4qb.png';
+    // ── mask mobile for PDF ──
+    const maskMobilePdf = (mobile) => {
+      if (!mobile || mobile.length < 5) return mobile;
+      return mobile.substring(0, 2) + 'XXXXXXXX' + mobile.substring(mobile.length - 2);
+    };
 
-  const setBlack = () => doc.setTextColor(0, 0, 0);
-
-  const bold = (txt, x, cy, size = 10, align = 'left') => {
-    setBlack();
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(size);
-    doc.text(txt, x, cy, { align });
-  };
-
-  const normal = (txt, x, cy, size = 10, align = 'left') => {
-    setBlack();
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(size);
-    doc.text(txt, x, cy, { align });
-  };
-
-  // 🔹 Convert image URL → base64
-  const loadImageAsBase64 = (url) => {
-    return new Promise((resolve) => {
+    const loadImageAsBase64 = (url) => new Promise((resolve) => {
       const img = new Image();
       img.crossOrigin = 'Anonymous';
       img.onload = function () {
         const canvas = document.createElement('canvas');
-        canvas.width = img.width;
-        canvas.height = img.height;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0);
+        canvas.width = img.width; canvas.height = img.height;
+        canvas.getContext('2d').drawImage(img, 0, 0);
         resolve(canvas.toDataURL('image/png'));
       };
+      img.onerror = () => resolve(null);
       img.src = url;
     });
-  };
 
-  // 🔥 WATERMARK FUNCTION
-  const addWatermark = (watermarkDataUrl) => {
-    if (!watermarkDataUrl) return;
+    const addContent = (logoBase64, watermarkBase64) => {
+      const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+      const pageW = doc.internal.pageSize.getWidth();
+      const pageH = doc.internal.pageSize.getHeight();
+      let y = 0;
 
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const pageHeight = doc.internal.pageSize.getHeight();
+      const setBlack = () => doc.setTextColor(0, 0, 0);
+      const bold   = (txt, x, cy, size=10, align='left') => { setBlack(); doc.setFont('helvetica','bold');   doc.setFontSize(size); doc.text(txt,x,cy,{align}); };
+      const normal = (txt, x, cy, size=10, align='left') => { setBlack(); doc.setFont('helvetica','normal'); doc.setFontSize(size); doc.text(txt,x,cy,{align}); };
 
-    const imgProps = doc.getImageProperties(watermarkDataUrl);
+      // ── WATERMARK — BEHIND content, low opacity trick via GState isn't available in jsPDF
+      // We draw watermark right after logo (before text), fully transparent-looking by placing before content
+      // Best approach: draw watermark ONCE per page BEFORE text is drawn
+      const drawWatermark = () => {
+        if (!watermarkBase64) return;
+        try {
+          const imgProps = doc.getImageProperties(watermarkBase64);
+          const wW = pageW * 0.45;
+          const wH = (imgProps.height * wW) / imgProps.width;
+          const wx = (pageW - wW) / 2;
+          const wy = (pageH - wH) / 2;
+          // Draw with low opacity by using a light composite — jsPDF doesn't support opacity natively,
+          // so we draw the watermark first and content on top. The order is: watermark → text/tables.
+          doc.addImage(watermarkBase64, 'PNG', wx, wy, wW, wH);
+        } catch(e) { console.log('Watermark error:', e); }
+      };
 
-    const imgWidth = pageWidth * 0.5;
-    const imgHeight = (imgProps.height * imgWidth) / imgProps.width;
-
-    const x = (pageWidth - imgWidth) / 2;
-    const yCenter = (pageHeight - imgHeight) / 2;
-
-    doc.addImage(watermarkDataUrl, 'PNG', x, yCenter, imgWidth, imgHeight);
-  };
-
-  const addContent = (logoBase64, watermarkBase64) => {
-
-    // ✅ Add watermark FIRST (background)
-    addWatermark(watermarkBase64);
-
-    // ── LOGO FULL WIDTH ─────────────────────
-    if (logoBase64) {
-      try {
-        const pageWidth = doc.internal.pageSize.getWidth();
-        const imgProps = doc.getImageProperties(logoBase64);
-        const imgHeight = (imgProps.height * pageWidth) / imgProps.width;
-
-        doc.addImage(logoBase64, 'PNG', 0, y, pageWidth, imgHeight);
-        y += imgHeight + 5;
-      } catch(e) {
-        console.log("Logo error:", e);
+      // ── LOGO ──
+      if (logoBase64) {
+        try {
+          const imgProps = doc.getImageProperties(logoBase64);
+          const imgH = (imgProps.height * pageW) / imgProps.width;
+          doc.addImage(logoBase64, 'PNG', 0, y, pageW, imgH);
+          y += imgH + 5;
+        } catch(e) { console.log("Logo error:", e); }
       }
-    }
 
-    // ── TITLE ──────────────────────────────
-    bold('AUTHORIZATION LETTER', 105, y + 8, 14, 'center');
-    y += 20;
+      // Draw watermark NOW — before any text — so all text/tables render on top
+      drawWatermark();
 
-    // Date
-    normal(`Date: ${dd} / ${mm} / ${yyyy}`, RIGHT, y, 10, 'right');
-    y += 7;
+      // ── TITLE ──
+      bold('AUTHORIZATION LETTER', 105, y + 8, 14, 'center');
+      y += 20;
 
-    // To
-    normal('To,', LEFT, y); y += 5;
-    bold('The Centre Superintendent/Principal', LEFT, y); y += 5;
-    normal('Concern Examination', LEFT, y); y += 6;
+      normal(`Date: ${dd} / ${mm} / ${yyyy}`, RIGHT, y, 10, 'right'); y += 7;
 
-    // Subject
-    bold('Subject: Authorization for Exam Centre Supervisor and Manpower Deployment', LEFT, y);
-    y += 7;
+      normal('To,', LEFT, y); y += 5;
+      bold('The Centre Superintendent/Principal', LEFT, y); y += 5;
+      normal('Concern Examination', LEFT, y); y += 6;
 
-    // Greeting
-    normal('Dear Sir/Madam,', LEFT, y); y += 6;
+      bold('Subject: Authorization for Exam Centre Supervisor and Manpower Deployment', LEFT, y); y += 7;
+      normal('Dear Sir/Madam,', LEFT, y); y += 6;
 
-    // Body
-    const bodyText =
-      'We hereby authorize the following personnel for deployment at the JPSC JET Examination ' +
-      'Centre Exam Date 26.04.2026. The details of the Centre Supervisor and manpower, along with ' +
-      'their Aadhaar information, are provided below.';
+      const bodyText = 'We hereby authorize the following personnel for deployment at the JPSC JET Examination Centre Exam Date 26.04.2026. The details of the Centre Supervisor and manpower, along with their Aadhaar information, are provided below.';
+      const bodyLines = doc.splitTextToSize(bodyText, WIDTH);
+      doc.text(bodyLines, LEFT, y); y += bodyLines.length * 5 + 4;
 
-    const bodyLines = doc.splitTextToSize(bodyText, WIDTH);
-    doc.text(bodyLines, LEFT, y);
-    y += bodyLines.length * 5 + 4;
+      bold('1. Centre Details:', LEFT, y); y += 6;
+      const centreFields = [
+        { label: 'Centre Name:', value: d.centreName || '________' },
+        { label: 'Centre Code:', value: d.centreCode || '________' },
+        { label: 'Location/Address:', value: `${d.centreName || ''}, ${d.city || ''}, ${d.state || ''}` },
+      ];
+      centreFields.forEach(f => { bold(f.label, LEFT, y); normal(f.value, LEFT + 50, y); y += 6; });
 
-    // Section 1
-    bold('1. Centre Details:', LEFT, y); y += 6;
+      bold('2. Centre Supervisor Details:', LEFT, y); y += 4;
 
-    const centreFields = [
-      { label: 'Centre Name:', value: d.centreName || '________' },
-      { label: 'Centre Code:', value: d.centreCode || '________' },
-      { label: 'Location/Address:', value: `${d.centreName || ''}, ${d.city || ''}, ${d.state || ''}` },
-    ];
+      doc.autoTable({
+        startY: y,
+        head: [['S. No.', 'Name', 'Mobile', 'Aadhaar']],
+        body: (d.supervisors || []).map((s,i) => [i+1, s.name, maskMobilePdf(s.mobile), s.aadhaar]),
+        styles: { fontSize: 9, cellPadding: 3 },
+        headStyles: { fillColor: [21, 101, 192], textColor: 255, fontStyle: 'bold' },
+        alternateRowStyles: { fillColor: [235, 245, 255] },
+        tableLineColor: [200, 220, 240],
+        tableLineWidth: 0.3,
+      });
+      y = doc.lastAutoTable.finalY + 6;
 
-    centreFields.forEach(f => {
-      bold(f.label, LEFT, y);
-      normal(f.value, LEFT + 50, y);
-      y += 6;
-    });
+      bold('3. Manpower Details:', LEFT, y); y += 4;
 
-    // Supervisor Table
-    bold('2. Centre Supervisor Details:', LEFT, y); y += 4;
+      doc.autoTable({
+        startY: y,
+        head: [['S. No.', 'Name', 'Role', 'Mobile', 'Aadhaar']],
+        body: (d.operators || []).map((o,i) => [i+1, o.name, o.designation, maskMobilePdf(o.mobile), o.aadhaar]),
+        styles: { fontSize: 9, cellPadding: 3 },
+        headStyles: { fillColor: [21, 101, 192], textColor: 255, fontStyle: 'bold' },
+        alternateRowStyles: { fillColor: [235, 245, 255] },
+        tableLineColor: [200, 220, 240],
+        tableLineWidth: 0.3,
+      });
+      y = doc.lastAutoTable.finalY + 6;
 
-    doc.autoTable({
-      startY: y,
-      head: [['S. No.', 'Name', 'Mobile', 'Aadhaar']],
-      body: (d.supervisors || []).map((s,i)=>[
-        i+1, s.name, s.mobile, s.aadhaar
-      ])
-    });
+      const closeText = 'All the above-mentioned personnel are authorized to perform their respective duties at the examination centre.';
+      const closeLines = doc.splitTextToSize(closeText, WIDTH);
+      doc.setFont('helvetica','bold'); doc.setFontSize(10); doc.setTextColor(0,0,0);
+      doc.text(closeLines, LEFT, y); y += closeLines.length * 5 + 10;
 
-    y = doc.lastAutoTable.finalY + 6;
+      normal('Thanking You,', LEFT, y); y += 14;
+      normal('Authorised Signatory', LEFT, y); y += 5;
+      normal('Abhinnovation Technologies Pvt. Ltd.', LEFT, y); y += 14;
 
-    // Manpower Table
-    bold('3. Manpower Details:', LEFT, y); y += 4;
+      // ── ELECTRONIC DOCUMENT FOOTER LINE ──
+      const footerY = pageH - 18;
+      doc.setDrawColor(21, 101, 192);
+      doc.setLineWidth(0.4);
+      doc.line(LEFT, footerY - 3, RIGHT, footerY - 3);
 
-    doc.autoTable({
-      startY: y,
-      head: [['S. No.', 'Name', 'Role', 'Mobile', 'Aadhaar']],
-      body: (d.operators || []).map((o,i)=>[
-        i+1, o.name, o.designation, o.mobile, o.aadhaar
-      ])
-    });
-
-    y = doc.lastAutoTable.finalY + 6;
-
-    // Closing
-    const closeText =
-      'All the above-mentioned personnel are authorized to perform their respective duties at the examination centre.';
-    const closeLines = doc.splitTextToSize(closeText, WIDTH);
-    doc.text(closeLines, LEFT, y);
-    y += closeLines.length * 5 + 10;
-
-    normal('Thanking You,', LEFT, y);
-
-    // Page numbers
-    const pageCount = doc.internal.getNumberOfPages();
-    for (let i = 1; i <= pageCount; i++) {
-      doc.setPage(i);
+      doc.setFontSize(7.5);
+      doc.setFont('helvetica', 'italic');
+      doc.setTextColor(80, 80, 80);
+      doc.text(
+        'This is a system-generated authorization letter. It does not require a physical signature or official seal.',
+        105, footerY + 1, { align: 'center' }
+      );
       doc.setFontSize(7);
-      doc.setTextColor(150);
-      doc.text(`Page ${i} of ${pageCount}`, 105, 290, { align:'center' });
-    }
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(120, 120, 120);
+      doc.text(
+        `Generated on ${dd}/${mm}/${yyyy} | JPSC JET Examination 2026 | Centre Code: ${d.centreCode}`,
+        105, footerY + 5.5, { align: 'center' }
+      );
 
-    doc.save(`Authorization_${d.centreCode}.pdf`);
-  };
+      // Page numbers
+      const pageCount = doc.internal.getNumberOfPages();
+      for (let i = 1; i <= pageCount; i++) {
+        doc.setPage(i);
+        doc.setFontSize(7);
+        doc.setTextColor(150);
+        doc.text(`Page ${i} of ${pageCount}`, 105, 290, { align: 'center' });
+      }
 
-  // 🔥 Load both images
-  Promise.all([
-    loadImageAsBase64(logoUrl),
-    loadImageAsBase64(watermarkUrl)
-  ]).then(([logoBase64, watermarkBase64]) => {
-    addContent(logoBase64, watermarkBase64);
-  });
-}
-    // ── Load logo image via fetch → base64, then build PDF ───────
-    // ── Load logo image via fetch → base64, then build PDF ───────
+      doc.save(`Authorization_${d.centreCode}.pdf`);
+    };
 
-//const getBase64FromUrl = async (url) => {
-//  const res = await fetch(url);
- // if (!res.ok) throw new Error("Image fetch failed");
-
-//  const blob = await res.blob();
-
-  //return new Promise((resolve, reject) => {
- //   const reader = new FileReader();
-  //  reader.onloadend = () => resolve(reader.result);
- //   reader.onerror = reject;
- //   reader.readAsDataURL(blob);
-//  });
-//};
-
-//getBase64FromUrl(logoUrl)
- // .then(dataUrl => addContent(dataUrl))
- // .catch(err => {
-  //  console.log("Image load failed:", err);
- //   addContent(null);
- // });
-//  }
-//-->
-  // ── Helpers ──────────────────────────────────────────────────────────────────
-  function showLoading(show) {
-    document.getElementById('loading').style.display = show ? 'block' : 'none';
+    Promise.all([loadImageAsBase64(logoUrl), loadImageAsBase64(watermarkUrl)])
+      .then(([logoBase64, watermarkBase64]) => addContent(logoBase64, watermarkBase64));
   }
-  function showError(msg) {
-    const el = document.getElementById('errorMsg');
-    el.textContent = msg;
-    el.style.display = 'block';
-  }
-  function hideError() {
-    document.getElementById('errorMsg').style.display = 'none';
-  }
+
+  function showLoading(show) { document.getElementById('loading').style.display = show ? 'block' : 'none'; }
+  function showError(msg)    { const el = document.getElementById('errorMsg'); el.textContent = msg; el.style.display = 'block'; }
+  function hideError()       { document.getElementById('errorMsg').style.display = 'none'; }
 </script>
 </body>
 </html>
